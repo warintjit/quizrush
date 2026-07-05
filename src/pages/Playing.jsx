@@ -471,6 +471,10 @@ function PlayerEngine({ gameId }) {
             <p className="muted" style={{ marginTop: 0 }}>คะแนนสุดท้ายของคุณ</p>
             <div className="final-score">{score}</div>
             <div className="spacer" />
+            <button className="btn btn-primary" onClick={() => nav('/join')}>
+              🎮 เข้าร่วมเกมใหม่
+            </button>
+            <div className="spacer" />
             <button className="btn btn-ghost" onClick={() => nav('/')}>
               กลับหน้าแรก
             </button>

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { joinGame, saveSession } from '../lib/api'
+import { joinGame, saveSession, loadSession } from '../lib/api'
 import { ColorPicker } from '../components/Pieces'
 import { AVATAR_COLORS } from '../lib/constants'
 
@@ -9,9 +9,12 @@ export default function JoinPage() {
   const [params] = useSearchParams()
   const roomFromQR = (params.get('room') || '').replace(/\D/g, '').slice(0, 6)
 
+  // จำชื่อ/สีจากเกมก่อน เพื่อไม่ต้องกรอกใหม่ทุกรอบ (รหัสห้องต้องกรอกใหม่เสมอ)
+  const prev = loadSession()
+
   const [code, setCode] = useState(roomFromQR)
-  const [nickname, setNickname] = useState('')
-  const [color, setColor] = useState(AVATAR_COLORS[0])
+  const [nickname, setNickname] = useState(prev?.nickname || '')
+  const [color, setColor] = useState(prev?.color || AVATAR_COLORS[0])
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState('')
 
