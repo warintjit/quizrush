@@ -124,10 +124,24 @@ input[type=range]{flex:1;accent-color:var(--cyan);}
 .feedback-icon{font-size:3rem;}
 .feedback-title{font-family:"Chakra Petch";font-weight:700;font-size:1.3rem;margin-top:4px;}
 .feedback-points{font-family:"Chakra Petch";font-weight:800;font-size:1.6rem;color:var(--lime);margin-top:6px;}
+.feedback-penalty{color:var(--coral);}
 .feedback-correct{border-color:var(--lime);}
 .feedback-wrong{border-color:var(--coral);}
 
 .box-emoji{font-size:3.4rem;line-height:1;}
+
+/* ----- เลือกกล่องพลัง 3 ใบ (จอนักเรียน) ----- */
+.box-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;margin-top:6px;}
+.box-choice{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  padding:18px 6px;border-radius:16px;background:var(--asphalt-2);border:2px solid var(--line);
+  color:var(--paper);cursor:pointer;transition:transform .12s ease,border-color .12s ease,box-shadow .12s ease;}
+.box-choice:hover:not(:disabled){transform:translateY(-3px) scale(1.03);border-color:var(--gold);
+  box-shadow:0 10px 26px rgba(255,201,77,.28);}
+.box-choice:active:not(:disabled){transform:scale(.97);}
+.box-choice:disabled{opacity:.55;cursor:default;}
+.box-choice-emoji{font-size:2.2rem;line-height:1;animation:boxWobble 1.6s ease-in-out infinite;}
+.box-choice-label{font-family:"Chakra Petch";font-weight:700;font-size:.9rem;}
+@keyframes boxWobble{0%,100%{transform:rotate(-5deg);}50%{transform:rotate(5deg);}}
 .powerup-card{padding-top:28px;padding-bottom:28px;}
 .target-badge{display:flex;align-items:center;gap:8px;background:var(--asphalt-2);
   border:1px solid var(--line);border-radius:999px;padding:8px 16px;font-size:.95rem;}
@@ -215,6 +229,7 @@ input[type=range]{flex:1;accent-color:var(--cyan);}
 .toast-steal{background:#ff6b5e;color:#2c0a06;}
 .toast-sabotage{background:var(--gold);color:#3a2a00;}
 .toast-shield{background:var(--cyan);color:#06222a;}
+.toast-reflect{background:var(--violet);color:#1a0a2e;}
 
 /* ----- ปุ่มถูก/ผิด (จอนักเรียน) ----- */
 .tf-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}

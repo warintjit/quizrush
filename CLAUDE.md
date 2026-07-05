@@ -21,7 +21,9 @@
 
 ## ฐานข้อมูล (Supabase)
 ตาราง: games, questions, players, answers, powerups, player_powerups, **question_sets, bank_questions** (คลังข้อสอบกลาง)
-- รัน SQL ตามลำดับ: `01_schema_v0.sql` → `02_lobby_rpcs.sql` → `03_seed_questions.sql` → `04_question_bank.sql` → `05_end_game.sql` → `06_admin_extras.sql`
+- รัน SQL ตามลำดับ: `01_schema_v0.sql` → `02_lobby_rpcs.sql` → `03_seed_questions.sql` → `04_question_bank.sql` → `05_end_game.sql` → `06_admin_extras.sql` → `07_penalty_reflect.sql`
+- **ตอบผิดหักคะแนน** `settings.wrong_penalty` (ดีฟอลต์ 50) ไม่ต่ำกว่า 0 — กันตอบมั่ว (แก้ใน `07`)
+- พลัง 7 อัน (เพิ่ม **โล่สะท้อน** `reflect`: เด้งขโมย/กับดักกลับใส่คนโจมตี 1 ครั้ง · คอลัมน์ `players.reflect`) · ตอนตอบถูกเลือกกด 1 ใน 3 กล่องเอง พลังสุ่มฝั่งเซิร์ฟเวอร์
 - RPC หลัก: create_game (รับ track_max), start_game, **end_game**, join_game, get_next_question, submit_answer, open_box, execute_targeted_power
 - RPC คลังข้อสอบ: create_question_set, delete_question_set, rename_question_set, add_bank_question, update_bank_question, import_bank_questions, delete_bank_question, copy_set_to_game (รองรับ image_url)
 - `questions.qtype` / `bank_questions.qtype` = `'mc'` (ปรนัย 4 ตัวเลือก) หรือ `'tf'` (ถูก/ผิด, choices=[ถูก,ผิด], correct_index 0=ถูก 1=ผิด)

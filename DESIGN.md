@@ -94,12 +94,12 @@ if sabotaged:
 ```
 
 หลังตอบ: `multiplier_next → 1`, `sabotaged → false` (ใช้แล้วรีเซ็ต)
-ตอบผิด: `points = 0` ไม่ลดคะแนนเดิม
-ค่าเริ่มต้นใน `games.settings`: `base_points=100, speed_bonus_max=50, speed_bonus_on=true, track_max_score=3000`
+**ตอบผิด: หักคะแนน `-wrong_penalty` (ดีฟอลต์ 50)** — กันตอบมั่ว · คะแนนรวมไม่ต่ำกว่า 0 (`greatest(0, ...)`)
+ค่าเริ่มต้นใน `games.settings`: `base_points=100, speed_bonus_max=50, speed_bonus_on=true, wrong_penalty=50, track_max_score=3000`
 
 ---
 
-## 4. พลังในกล่อง (6 อัน)
+## 4. พลังในกล่อง (7 อัน)
 
 | code | ชื่อ | ผล | จังหวะ | weight |
 |------|------|----|--------|--------|
@@ -107,11 +107,14 @@ if sabotaged:
 | double | คูณสอง | ตอบถูกข้อถัดไป ×2 | instant | 22 |
 | steal | ขโมยแต้ม | สุ่มคู่แข่ง 1 คน กดขโมย 100 แต้ม | **attack** | 16 |
 | shield | โล่ | กันโดนขโมย 1 ครั้ง | instant | 16 |
+| reflect | โล่สะท้อน | โดนขโมย/กับดัก แล้วเด้งกลับใส่คนโจมตี 1 ครั้ง | instant | 12 |
 | jackpot | แจ็กพ็อต | สุ่ม +50 ถึง +400 | instant | 11 |
 | sabotage | กับดัก | สุ่มคู่แข่ง 1 คน ตอบถูกครั้งหน้าได้ครึ่ง | **attack** | 10 |
 
 - **attack** = ระบบสุ่มเป้าหมายให้ ล็อกไว้ ผู้เล่นกดยืนยันเท่านั้น (กันรุมแกล้งเจาะจง)
-- โล่ของเป้าหมายกันการขโมยได้ 1 ครั้ง (ใช้แล้วหมด)
+- **โล่** กันการขโมยได้ 1 ครั้ง (ใช้แล้วหมด) — กันได้เฉพาะขโมย
+- **โล่สะท้อน** เด้งทั้งขโมย+กับดักกลับใส่คนโจมตี 1 ครั้ง (ขโมย→เป้าขโมยกลับ, กับดัก→คนโจมตีโดนเอง) · เช็กก่อนโล่ธรรมดา
+- **ตอนตอบถูก** ผู้เล่นเลือกกด 1 ใน 3 กล่องเองได้ แต่พลังข้างในสุ่มฝั่งเซิร์ฟเวอร์ (เดา/โกงไม่ได้)
 
 ---
 
@@ -121,7 +124,7 @@ if sabotaged:
 |-------|--------------|
 | games | room_code, status(enum lobby/running/finished), duration_min, started_at, ends_at, settings(jsonb มี track_max_score) |
 | questions | game_id, **qtype**('mc'/'tf'), body, image_url, choices(jsonb), **correct_index** |
-| players | game_id, nickname, avatar_color, score, multiplier_next, shield, sabotaged, pending_power, pending_target |
+| players | game_id, nickname, avatar_color, score, multiplier_next, shield, **reflect**, sabotaged, pending_power, pending_target |
 | answers | player_id, question_id, selected_index, is_correct, points_awarded, time_taken_ms |
 | powerups | code, name_th, effect_type, effect_val, weight (แคตตาล็อก + seed 6 อัน) |
 | player_powerups | player_id, powerup_id, source_answer_id (log การเปิดกล่อง) |
@@ -218,7 +221,8 @@ quiz-rush/
 │  ├─ 03_seed_questions.sql   seed คำถามตัวอย่าง
 │  ├─ 04_question_bank.sql    question_sets + bank_questions + RPC คลังข้อสอบ
 │  ├─ 05_end_game.sql     end_game RPC
-│  └─ 06_admin_extras.sql แก้ไขข้อสอบ/ชุด + image_url
+│  ├─ 06_admin_extras.sql แก้ไขข้อสอบ/ชุด + image_url
+│  └─ 07_penalty_reflect.sql   หักคะแนนตอบผิด + พลังโล่สะท้อน
 ├─ public/
 │  ├─ _redirects          SPA fallback (Netlify)
 │  └─ fonts/Sarabun-Bold.ttf   ฟอนต์ไทยสำหรับป้ายชื่อในสนาม 3D

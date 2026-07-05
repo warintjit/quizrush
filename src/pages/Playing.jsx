@@ -271,6 +271,7 @@ function PlayerEngine({ gameId }) {
   const prevScoreRef = useRef(null)
   const prevSabotagedRef = useRef(false)
   const prevShieldRef = useRef(false)
+  const prevReflectRef = useRef(false)
 
   function pushNotice(text, kind) {
     const id = Math.random().toString(36).slice(2)
@@ -286,6 +287,7 @@ function PlayerEngine({ gameId }) {
   const [attackResult, setAttackResult] = useState(null)
   const [err, setErr] = useState('')
   const [selecting, setSelecting] = useState(false)
+  const [opening, setOpening] = useState(false) // กันกดกล่องซ้ำ
 
   const startedAtRef = useRef(0)
 
@@ -335,6 +337,7 @@ function PlayerEngine({ gameId }) {
       prevScoreRef.current = p.score
       prevSabotagedRef.current = p.sabotaged
       prevShieldRef.current = p.shield
+      prevReflectRef.current = p.reflect
     })
     const unsub = subscribePlayer(session.playerId, (payload) => {
       if (!alive) return
@@ -353,9 +356,15 @@ function PlayerEngine({ gameId }) {
       if (!np.shield && prevShieldRef.current) {
         pushNotice('โล่ของคุณกันการขโมยไว้ได้!', 'shield')
       }
+      // reflect true -> false = โล่สะท้อนเด้งการโจมตีกลับให้ 1 ครั้ง
+      if (!np.reflect && prevReflectRef.current) {
+        pushNotice('โล่สะท้อนเด้งการโจมตีกลับใส่คนโจมตี!', 'reflect')
+        sfx.box()
+      }
       prevScoreRef.current = np.score
       prevSabotagedRef.current = np.sabotaged
       prevShieldRef.current = np.shield
+      prevReflectRef.current = np.reflect
       setScore(np.score)
     })
     return () => {
@@ -416,7 +425,10 @@ function PlayerEngine({ gameId }) {
     loadQuestion()
   }
 
-  async function onOpenBox() {
+  // เลือกกล่องไหนก็ได้ — พลังข้างในสุ่มฝั่งเซิร์ฟเวอร์ (กันโกง เดาไม่ได้)
+  async function onOpenBox(_boxIndex) {
+    if (opening) return
+    setOpening(true)
     setErr('')
     try {
       const result = await openBox(session.playerId, feedback.source_answer_id)
@@ -430,6 +442,8 @@ function PlayerEngine({ gameId }) {
     } catch (e) {
       setErr(e.message || 'เปิดกล่องไม่สำเร็จ')
       setPhase('error')
+    } finally {
+      setOpening(false)
     }
   }
 
@@ -475,6 +489,7 @@ function PlayerEngine({ gameId }) {
             {nt.kind === 'steal' && '🧲 '}
             {nt.kind === 'sabotage' && '🍌 '}
             {nt.kind === 'shield' && '🛡️ '}
+            {nt.kind === 'reflect' && '🪞 '}
             {nt.text}
           </div>
         ))}
@@ -547,8 +562,12 @@ function PlayerEngine({ gameId }) {
             <div className="feedback-title">
               {feedback.is_correct ? 'ตอบถูก!' : 'ตอบผิด'}
             </div>
-            {feedback.is_correct && (
+            {feedback.is_correct ? (
               <div className="feedback-points">+{feedback.points} แต้ม</div>
+            ) : (
+              feedback.points < 0 && (
+                <div className="feedback-points feedback-penalty">{feedback.points} แต้ม</div>
+              )
             )}
             <div className="spacer" />
             <button className="btn btn-lime" onClick={onContinueAfterFeedback}>
@@ -559,12 +578,22 @@ function PlayerEngine({ gameId }) {
 
         {phase === 'box' && (
           <div className="card center">
-            <div className="box-emoji">🎁</div>
-            <p className="muted">ตอบถูก! เลือกเปิดกล่องสุ่มพลัง 1 ใน 3</p>
+            <div className="feedback-title">🎁 เลือกกล่องพลัง</div>
+            <p className="muted">ตอบถูก! เลือกเปิด 1 ใน 3 กล่อง — ข้างในสุ่มพลัง</p>
             <div className="spacer" />
-            <button className="btn btn-gold" onClick={onOpenBox}>
-              เปิดกล่อง
-            </button>
+            <div className="box-grid">
+              {[0, 1, 2].map((i) => (
+                <button
+                  key={i}
+                  className="box-choice"
+                  disabled={opening}
+                  onClick={() => onOpenBox(i)}
+                >
+                  <span className="box-choice-emoji">🎁</span>
+                  <span className="box-choice-label">กล่อง {i + 1}</span>
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
