@@ -4,8 +4,18 @@ import { QRCodeCanvas } from 'qrcode.react'
 import { createGame, startGame, fetchPlayers, subscribePlayers, fetchSets, copySetToGame } from '../lib/api'
 import { supabase } from '../lib/supabase'
 import { PlayerChip } from '../components/Pieces'
+import AdminGate from '../components/AdminGate'
 
+// ครูต้องกรอกรหัสเดียวกับผู้ดูแลก่อนถึงจะสร้างห้องได้
 export default function HostLobby() {
+  return (
+    <AdminGate subtitle="สร้างห้องแข่ง (สำหรับครู)">
+      <HostLobbyInner />
+    </AdminGate>
+  )
+}
+
+function HostLobbyInner() {
   const nav = useNavigate()
   const [phase, setPhase] = useState('create') // create | lobby
   const [duration, setDuration] = useState(5)
