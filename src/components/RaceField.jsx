@@ -1,6 +1,6 @@
 import { Suspense, useMemo, useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { Text, Billboard, Sparkles, Stars } from '@react-three/drei'
+import { Text, Billboard, Sparkles } from '@react-three/drei'
 import * as THREE from 'three'
 
 // ---------- ค่าคงที่สนามวงรอบ (วงรี) ----------
@@ -10,6 +10,9 @@ const ROAD_W = 8                 // ความกว้างถนน
 const LAPS_AT_MAX = 2            // เมื่อถึง track_max_score จะวิ่งครบ ~กี่รอบ (มากขึ้น = ช้าลง)
 const LERP_SPEED = 1.7           // ความเร็ว interpolate ตำแหน่ง (ต่ำลง = ไหลนุ่มช้าลง)
 const FONT = '/fonts/Sarabun-Bold.ttf' // ฟอนต์ไทย (drei Text ไม่รองรับไทยโดยปริยาย)
+
+// สีสันงานรื่นเริง ใช้กับธงราว/ลูกโป่ง/คอนเฟตตี
+const FEST_COLORS = ['#ff6b5e', '#ffc94d', '#9ae65c', '#22d3ee', '#a78bfa', '#f472b6']
 
 // คะแนน -> มุมรอบวง (ต่อเนื่อง ไม่ wrap; cos/sin จัดการวนเอง)
 // perLap = คะแนนต่อ 1 รอบ (อิง track_max_score เพื่อให้สมดุลกับเวลาเกม)
@@ -267,13 +270,13 @@ function Ground() {
     <group>
       {/* หญ้า (พื้นใหญ่ใต้ทุกอย่าง — ตรงกลางวงเห็นเป็นสนามหญ้า) */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.05, 0]}>
-        <planeGeometry args={[120, 100]} />
-        <meshStandardMaterial color="#2f7d4f" roughness={1} />
+        <planeGeometry args={[160, 130]} />
+        <meshStandardMaterial color="#4cbf65" roughness={1} />
       </mesh>
 
       {/* ถนน */}
       <mesh geometry={roadGeo} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
-        <meshStandardMaterial color="#28323f" roughness={0.95} />
+        <meshStandardMaterial color="#3a4658" roughness={0.9} />
       </mesh>
 
       {/* เส้นขอบ */}
@@ -347,6 +350,185 @@ function Roadside() {
   )
 }
 
+// =====================================================================
+// ท้องฟ้าไล่เฉด (โดมครอบทั้งฉาก) — ฟ้าสดใสด้านบน อุ่นละมุนที่ขอบฟ้า
+// =====================================================================
+function SkyDome() {
+  const tex = useMemo(() => {
+    const c = document.createElement('canvas')
+    c.width = 8
+    c.height = 256
+    const ctx = c.getContext('2d')
+    const g = ctx.createLinearGradient(0, 0, 0, 256)
+    g.addColorStop(0.0, '#4db6ff')   // ยอดฟ้า
+    g.addColorStop(0.5, '#9fdcff')
+    g.addColorStop(0.82, '#dff2ff')
+    g.addColorStop(1.0, '#ffe7c2')   // ขอบฟ้าอุ่น
+    ctx.fillStyle = g
+    ctx.fillRect(0, 0, 8, 256)
+    const t = new THREE.CanvasTexture(c)
+    t.needsUpdate = true
+    return t
+  }, [])
+  return (
+    <mesh>
+      <sphereGeometry args={[220, 32, 16]} />
+      <meshBasicMaterial map={tex} side={THREE.BackSide} fog={false} depthWrite={false} />
+    </mesh>
+  )
+}
+
+// เมฆก้อนนุ่ม (สเฟียร์ซ้อน) ลอยหมุนช้า ๆ รอบสนาม
+function CloudPuff({ scale }) {
+  const puffs = [
+    [0, 0, 0, 1.4],
+    [1.3, -0.1, 0.2, 1.0],
+    [-1.3, -0.1, -0.2, 1.0],
+    [0.5, 0.45, 0.3, 0.9],
+    [-0.6, 0.35, -0.3, 0.8],
+  ]
+  return (
+    <group scale={scale}>
+      {puffs.map(([x, y, z, r], i) => (
+        <mesh key={i} position={[x, y, z]}>
+          <sphereGeometry args={[r, 10, 10]} />
+          <meshStandardMaterial color="#ffffff" roughness={1} emissive="#eaf3ff" emissiveIntensity={0.2} />
+        </mesh>
+      ))}
+    </group>
+  )
+}
+
+function Clouds() {
+  const grp = useRef()
+  const clouds = useMemo(() => {
+    const arr = []
+    const N = 8
+    for (let i = 0; i < N; i++) {
+      const a = (i / N) * Math.PI * 2 + 0.3
+      const r = 68 + (i % 3) * 14
+      arr.push({ x: Math.cos(a) * r, y: 30 + (i % 4) * 5, z: Math.sin(a) * r, s: 2.2 + (i % 3) * 0.7 })
+    }
+    return arr
+  }, [])
+  useFrame((s) => {
+    if (grp.current) grp.current.rotation.y = s.clock.elapsedTime * 0.008
+  })
+  return (
+    <group ref={grp}>
+      {clouds.map((c, i) => (
+        <group key={i} position={[c.x, c.y, c.z]}>
+          <CloudPuff scale={c.s} />
+        </group>
+      ))}
+    </group>
+  )
+}
+
+// ธงราวหลากสี บนเสาโดยรอบสนาม (ธงสามเหลี่ยมห้อยเป็นระย้า)
+function Bunting() {
+  const rx = RX + ROAD_W / 2 + 2.4
+  const rz = RZ + ROAD_W / 2 + 2.4
+  const N = 14
+  const per = 4
+
+  const poles = useMemo(() => {
+    const arr = []
+    for (let k = 0; k < N; k++) {
+      const a = (k / N) * Math.PI * 2
+      arr.push([rx * Math.cos(a), rz * Math.sin(a)])
+    }
+    return arr
+  }, [])
+
+  const flags = useMemo(() => {
+    const arr = []
+    for (let k = 0; k < N; k++) {
+      const a0 = (k / N) * Math.PI * 2
+      const a1 = ((k + 1) / N) * Math.PI * 2
+      for (let j = 0; j < per; j++) {
+        const tt = (j + 0.5) / per
+        const a = a0 + (a1 - a0) * tt
+        const sag = Math.sin(tt * Math.PI) * 0.55
+        arr.push({
+          x: rx * Math.cos(a),
+          z: rz * Math.sin(a),
+          y: 3.0 - sag,
+          a,
+          color: FEST_COLORS[(k * per + j) % FEST_COLORS.length],
+        })
+      }
+    }
+    return arr
+  }, [])
+
+  return (
+    <group>
+      {poles.map(([x, z], i) => (
+        <mesh key={i} position={[x, 1.6, z]}>
+          <cylinderGeometry args={[0.06, 0.07, 3.2, 6]} />
+          <meshStandardMaterial color="#eef2f8" roughness={0.6} />
+        </mesh>
+      ))}
+      {flags.map((f, i) => (
+        <mesh key={i} position={[f.x, f.y, f.z]} rotation={[Math.PI, -f.a, 0]}>
+          <coneGeometry args={[0.17, 0.42, 3]} />
+          <meshStandardMaterial color={f.color} roughness={0.55} side={THREE.DoubleSide} />
+        </mesh>
+      ))}
+    </group>
+  )
+}
+
+// ลูกโป่งหลากสี ลอยอยู่กลางสนาม เด้งขึ้นลงเบา ๆ
+function Balloons() {
+  const grp = useRef()
+  const items = useMemo(() => {
+    const arr = []
+    const N = 11
+    for (let i = 0; i < N; i++) {
+      const a = (i / N) * Math.PI * 2 + 0.15
+      const rr = RX * (0.32 + (i % 3) * 0.14)
+      arr.push({
+        x: Math.cos(a) * rr,
+        z: Math.sin(a) * (rr * RZ) / RX,
+        y: 6 + (i % 4) * 1.4,
+        color: FEST_COLORS[i % FEST_COLORS.length],
+        ph: Math.random() * Math.PI * 2,
+      })
+    }
+    return arr
+  }, [])
+  useFrame((s) => {
+    if (!grp.current) return
+    const t = s.clock.elapsedTime
+    grp.current.children.forEach((b, i) => {
+      b.position.y = items[i].y + Math.sin(t * 0.6 + items[i].ph) * 0.45
+      b.rotation.z = Math.sin(t * 0.5 + items[i].ph) * 0.12
+    })
+  })
+  return (
+    <group ref={grp}>
+      {items.map((b, i) => (
+        <group key={i} position={[b.x, b.y, b.z]}>
+          <mesh scale={[1, 1.2, 1]}>
+            <sphereGeometry args={[0.6, 16, 16]} />
+            <meshStandardMaterial color={b.color} roughness={0.3} />
+          </mesh>
+          <mesh position={[0, -0.72, 0]}>
+            <coneGeometry args={[0.1, 0.2, 8]} />
+            <meshStandardMaterial color={b.color} roughness={0.4} />
+          </mesh>
+          <mesh position={[0, -1.5, 0]}>
+            <cylinderGeometry args={[0.012, 0.012, 1.5, 4]} />
+            <meshStandardMaterial color="#ffffff" transparent opacity={0.5} />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  )
+}
+
 // กล้องมองวงรอบจากมุมสูงเฉียง + ส่ายช้า ๆ (ถอยให้เห็นสนามใหญ่ทั้งวง)
 function CameraRig() {
   useFrame((state) => {
@@ -374,15 +556,24 @@ function Scene({ players, maxScore }) {
   return (
     <>
       <CameraRig />
-      <fog attach="fog" args={['#0e1420', 70, 175]} />
-      <Stars radius={140} depth={60} count={1600} factor={3.5} fade speed={0.5} />
+      <fog attach="fog" args={['#cfeeff', 95, 205]} />
+      <SkyDome />
+      <Clouds />
 
-      <hemisphereLight args={['#bcd7ff', '#2f7d4f', 0.7]} />
-      <ambientLight intensity={0.35} />
-      <directionalLight position={[20, 30, 14]} intensity={1.15} color="#fff6e0" />
+      {/* แสงแดดกลางวันอุ่น ๆ สดใส */}
+      <hemisphereLight args={['#bfe6ff', '#4cbf65', 1.0]} />
+      <ambientLight intensity={0.5} />
+      <directionalLight position={[24, 34, 16]} intensity={1.35} color="#fff2d6" />
+
+      {/* คอนเฟตตีระยิบเหนือสนาม */}
+      <Sparkles count={70} scale={[95, 24, 66]} position={[0, 13, 0]} size={4} speed={0.35} color="#ffd24d" />
+      <Sparkles count={45} scale={[95, 22, 66]} position={[0, 11, 0]} size={3} speed={0.28} color="#ff6b5e" />
+      <Sparkles count={45} scale={[95, 22, 66]} position={[0, 12, 0]} size={3} speed={0.3} color="#22d3ee" />
 
       <Ground />
       <Roadside />
+      <Bunting />
+      <Balloons />
       {ranked.map((p, i) => {
         // กระจายเลนในแนวรัศมี ให้อยู่บนถนนและไม่ทับกัน
         const span = ROAD_W - 1.4
@@ -407,7 +598,7 @@ export default function RaceField({ players, maxScore = 3000 }) {
     <Canvas
       dpr={[1, 1.75]}
       camera={{ position: [0, 34, 46], fov: 50 }}
-      style={{ width: '100%', height: '100%', background: '#0e1420' }}
+      style={{ width: '100%', height: '100%', background: '#9fdcff' }}
     >
       <Suspense fallback={null}>
         <Scene players={players} maxScore={maxScore} />
