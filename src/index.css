@@ -1,0 +1,270 @@
+:root{
+  --ink:#0e1420;
+  --asphalt:#1b2433;
+  --asphalt-2:#232f42;
+  --paper:#f3f0e7;
+  --muted:#8b97ad;
+  --muted-2:#b9c2d4;
+  --cyan:#22d3ee;
+  --coral:#ff6b5e;
+  --gold:#ffc94d;
+  --lime:#9ae65c;
+  --violet:#a78bfa;
+  --line:rgba(255,255,255,.10);
+  --line-strong:rgba(255,255,255,.18);
+}
+*{box-sizing:border-box;}
+html,body,#root{height:100%;}
+body{
+  margin:0;background:var(--ink);color:var(--paper);
+  font-family:"Sarabun",system-ui,sans-serif;line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,.disp{font-family:"Chakra Petch",sans-serif;letter-spacing:.4px;margin:0;}
+
+.app{min-height:100%;display:flex;flex-direction:column;align-items:center;
+  padding:24px 18px 56px;}
+.wrap{width:100%;max-width:760px;margin:0 auto;}
+.center{display:flex;flex-direction:column;align-items:center;text-align:center;}
+
+.brand{font-family:"Chakra Petch";font-weight:700;font-size:1.9rem;
+  background:linear-gradient(90deg,var(--cyan),var(--lime),var(--gold));
+  -webkit-background-clip:text;background-clip:text;color:transparent;}
+.brand-sub{color:var(--muted);font-size:.95rem;margin-top:2px;}
+
+.card{background:var(--asphalt);border:1px solid var(--line);border-radius:18px;
+  padding:22px;box-shadow:0 18px 44px rgba(0,0,0,.4);}
+.card + .card{margin-top:16px;}
+
+label,.label{display:block;font-family:"Chakra Petch";font-size:.78rem;
+  letter-spacing:.5px;color:var(--muted-2);margin:0 0 7px;text-transform:uppercase;}
+
+.input{width:100%;background:var(--ink);border:1px solid var(--line-strong);
+  color:var(--paper);border-radius:12px;padding:13px 14px;font-size:1.05rem;
+  font-family:inherit;outline:none;}
+.input:focus{border-color:var(--cyan);}
+.input.code{font-family:"Chakra Petch";letter-spacing:8px;text-align:center;font-size:1.6rem;}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  font-family:"Chakra Petch";font-weight:700;font-size:1.02rem;cursor:pointer;
+  border:none;border-radius:14px;padding:14px 18px;width:100%;
+  transition:transform .05s ease,filter .15s ease;}
+.btn:active{transform:translateY(1px);}
+.btn:disabled{opacity:.45;cursor:not-allowed;}
+.btn-primary{background:var(--cyan);color:#06222a;}
+.btn-gold{background:var(--gold);color:#3a2a00;}
+.btn-lime{background:var(--lime);color:#143000;}
+.btn-ghost{background:transparent;border:1px solid var(--line-strong);color:var(--paper);}
+.btn-row{display:flex;gap:12px;margin-top:8px;}
+
+.swatches{display:flex;flex-wrap:wrap;gap:10px;}
+.swatch{width:42px;height:42px;border-radius:50%;cursor:pointer;border:3px solid transparent;}
+.swatch.sel{border-color:var(--paper);box-shadow:0 0 0 3px var(--ink),0 0 0 5px var(--cyan);}
+
+.code-badge{font-family:"Chakra Petch";font-weight:700;letter-spacing:10px;
+  font-size:2.6rem;color:var(--gold);text-align:center;}
+
+.qr-box{background:#fff;border-radius:16px;padding:16px;display:inline-block;}
+
+.count-pill{font-family:"Chakra Petch";font-size:.9rem;background:var(--asphalt-2);
+  border:1px solid var(--line);border-radius:999px;padding:7px 14px;}
+.count-pill b{color:var(--gold);}
+
+.player-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;}
+.player-chip{display:flex;align-items:center;gap:10px;background:var(--asphalt-2);
+  border:1px solid var(--line);border-radius:12px;padding:10px 12px;}
+.player-chip .dot{width:18px;height:18px;border-radius:50%;flex:0 0 auto;
+  border:2px solid rgba(0,0,0,.3);}
+.player-chip .nm{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+.muted{color:var(--muted);}
+.spacer{height:14px;}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.err{background:rgba(255,107,94,.12);border:1px solid var(--coral);color:#ffd2cc;
+  border-radius:12px;padding:10px 14px;font-size:.92rem;margin-top:12px;}
+.link{color:var(--cyan);cursor:pointer;background:none;border:none;font-family:inherit;
+  font-size:.95rem;text-decoration:underline;padding:0;}
+
+.dur-row{display:flex;align-items:center;gap:14px;}
+.dur-val{font-family:"Chakra Petch";font-weight:700;font-size:1.4rem;color:var(--gold);min-width:64px;}
+input[type=range]{flex:1;accent-color:var(--cyan);}
+
+@keyframes pulse{50%{opacity:.55;}}
+.waiting{animation:pulse 1.4s ease-in-out infinite;}
+@media (prefers-reduced-motion:reduce){.waiting{animation:none;}}
+
+.btn-coral{background:var(--coral);color:#2c0a06;}
+
+.score-hud{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.score-pill,.time-pill{font-family:"Chakra Petch";font-size:.95rem;background:var(--asphalt-2);
+  border:1px solid var(--line);border-radius:999px;padding:8px 16px;}
+.score-pill b{color:var(--gold);}
+.time-pill{color:var(--cyan);font-weight:700;}
+
+.q-image{width:100%;border-radius:12px;margin-bottom:14px;}
+.q-body{font-family:"Chakra Petch";font-size:1.25rem;font-weight:700;line-height:1.4;}
+
+.choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.choice-btn{display:flex;align-items:center;gap:10px;text-align:left;
+  border:none;border-radius:14px;padding:16px 14px;cursor:pointer;
+  font-family:inherit;font-size:.98rem;color:#0e1420;font-weight:600;
+  transition:transform .05s ease,filter .15s ease;}
+.choice-btn:active{transform:translateY(1px);}
+.choice-btn:disabled{opacity:.6;cursor:not-allowed;}
+.choice-letter{font-family:"Chakra Petch";font-weight:800;font-size:1.1rem;
+  flex:0 0 auto;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.18);
+  display:flex;align-items:center;justify-content:center;}
+.choice-text{flex:1;}
+.choice-a{background:var(--cyan);}
+.choice-b{background:var(--coral);color:#2c0a06;}
+.choice-c{background:var(--gold);}
+.choice-d{background:var(--lime);}
+
+.feedback-card{padding-top:30px;padding-bottom:30px;}
+.feedback-icon{font-size:3rem;}
+.feedback-title{font-family:"Chakra Petch";font-weight:700;font-size:1.3rem;margin-top:4px;}
+.feedback-points{font-family:"Chakra Petch";font-weight:800;font-size:1.6rem;color:var(--lime);margin-top:6px;}
+.feedback-correct{border-color:var(--lime);}
+.feedback-wrong{border-color:var(--coral);}
+
+.box-emoji{font-size:3.4rem;line-height:1;}
+.powerup-card{padding-top:28px;padding-bottom:28px;}
+.target-badge{display:flex;align-items:center;gap:8px;background:var(--asphalt-2);
+  border:1px solid var(--line);border-radius:999px;padding:8px 16px;font-size:.95rem;}
+.target-badge .dot{width:14px;height:14px;border-radius:50%;border:2px solid rgba(0,0,0,.3);}
+
+.final-score{font-family:"Chakra Petch";font-weight:800;font-size:3rem;color:var(--gold);text-align:center;}
+
+/* ----- โพเดียมประกาศผล (จอครู) ----- */
+.podium{display:flex;align-items:flex-end;justify-content:center;gap:14px;width:100%;margin:10px 0 20px;}
+.podium-col{display:flex;flex-direction:column;align-items:center;gap:5px;
+  background:var(--asphalt);border:1px solid var(--line);border-radius:16px 16px 0 0;
+  padding:16px 14px 0;width:150px;position:relative;}
+.podium-medal{font-size:2.2rem;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5));}
+.podium-name{font-family:"Chakra Petch";font-weight:700;font-size:1rem;text-align:center;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px;}
+.podium-score{font-family:"Chakra Petch";font-weight:800;color:var(--gold);font-size:1.3rem;}
+.podium-base{font-family:"Chakra Petch";font-weight:800;font-size:1.6rem;color:rgba(255,255,255,.5);
+  width:100%;text-align:center;margin-top:6px;border-radius:8px 8px 0 0;}
+.podium-1{order:2;}
+.podium-1 .podium-base{height:120px;background:linear-gradient(180deg,#ffc94d,#b8860b);color:#3a2a00;
+  display:flex;align-items:flex-start;justify-content:center;padding-top:8px;}
+.podium-1{box-shadow:0 0 26px rgba(255,201,77,.4);border-color:#ffc94d;}
+.podium-2{order:1;}
+.podium-2 .podium-base{height:88px;background:linear-gradient(180deg,#d6e0ee,#8893a5);color:#1b2433;
+  display:flex;align-items:flex-start;justify-content:center;padding-top:8px;}
+.podium-3{order:3;}
+.podium-3 .podium-base{height:64px;background:linear-gradient(180deg,#e0924c,#9c5a22);color:#2c1605;
+  display:flex;align-items:flex-start;justify-content:center;padding-top:8px;}
+@media (max-width:520px){.podium-col{width:104px;}.podium-medal{font-size:1.7rem;}}
+
+/* ----- จอครู: สนามแข่ง 3D เต็มจอ ----- */
+.host-stage{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--ink);}
+.host-topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:12px 20px;border-bottom:1px solid var(--line);flex:0 0 auto;}
+.host-stats{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.host-exit{width:auto;padding:8px 16px;font-size:.9rem;}
+.host-body{flex:1 1 auto;min-height:0;display:flex;}
+.host-canvas{flex:1 1 auto;min-width:0;min-height:0;}
+
+/* ----- Leaderboard สด ข้างขวาจอครู ----- */
+.host-leaderboard{flex:0 0 300px;display:flex;flex-direction:column;min-height:0;
+  background:rgba(27,36,51,.75);border-left:1px solid var(--line);backdrop-filter:blur(4px);}
+.lb-title{font-family:"Chakra Petch";font-weight:700;font-size:1rem;letter-spacing:.5px;
+  padding:14px 16px;border-bottom:1px solid var(--line);color:var(--gold);flex:0 0 auto;}
+.lb-list{flex:1 1 auto;overflow-y:auto;padding:8px;}
+.lb-row{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:10px;
+  margin-bottom:5px;background:var(--asphalt-2);border:1px solid var(--line);
+  transition:background .25s ease,border-color .25s ease;}
+.lb-rank{font-family:"Chakra Petch";font-weight:700;font-size:.95rem;min-width:24px;text-align:center;flex:0 0 auto;}
+
+/* 3 อันดับแรก: ทอง / เงิน / ทองแดง + เรืองแสง */
+.lb-top{padding:11px 12px;position:relative;overflow:hidden;}
+.lb-top .lb-rank{font-size:1.25rem;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5));}
+.lb-top .lb-name{font-weight:700;}
+.lb-1{background:linear-gradient(100deg,rgba(255,201,77,.30),rgba(255,201,77,.04));
+  border-color:#ffc94d;box-shadow:0 0 18px rgba(255,201,77,.35);
+  animation:lbGlow 2.2s ease-in-out infinite;}
+.lb-1 .lb-name,.lb-1 .lb-score{color:#ffe49c;}
+.lb-2{background:linear-gradient(100deg,rgba(214,224,238,.26),rgba(214,224,238,.04));
+  border-color:#cdd8ea;box-shadow:0 0 12px rgba(205,216,234,.22);}
+.lb-2 .lb-score{color:#e7eefb;}
+.lb-3{background:linear-gradient(100deg,rgba(224,146,76,.26),rgba(224,146,76,.04));
+  border-color:#e0924c;box-shadow:0 0 12px rgba(224,146,76,.22);}
+.lb-3 .lb-score{color:#f3b884;}
+@keyframes lbGlow{50%{box-shadow:0 0 28px rgba(255,201,77,.6);}}
+/* แถบสีเหลือบด้านซ้ายของ top3 */
+.lb-top::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;}
+.lb-1::before{background:#ffc94d;}
+.lb-2::before{background:#cdd8ea;}
+.lb-3::before{background:#e0924c;}
+.lb-dot{width:14px;height:14px;border-radius:50%;flex:0 0 auto;border:2px solid rgba(0,0,0,.3);}
+.lb-name{flex:1;min-width:0;font-weight:600;font-size:.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lb-score{font-family:"Chakra Petch";font-weight:700;color:var(--gold);font-size:.95rem;flex:0 0 auto;}
+.lb-up{color:var(--lime);font-size:.78rem;flex:0 0 auto;animation:lbpop .4s ease;}
+.lb-down{color:var(--coral);font-size:.78rem;flex:0 0 auto;animation:lbpop .4s ease;}
+@keyframes lbpop{0%{transform:translateY(3px) scale(.6);opacity:0;}100%{transform:none;opacity:1;}}
+@media (max-width:640px){.host-leaderboard{flex-basis:160px;}.lb-name{display:none;}}
+
+/* ----- Toast แจ้งเตือนโดนพลังโจมตี (จอนักเรียน) ----- */
+.toast-wrap{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:50;
+  display:flex;flex-direction:column;gap:8px;width:calc(100% - 32px);max-width:420px;pointer-events:none;}
+.toast{font-family:"Chakra Petch";font-weight:700;font-size:.95rem;padding:12px 16px;border-radius:12px;
+  text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.45);animation:toastIn .3s ease;}
+@keyframes toastIn{from{transform:translateY(-14px);opacity:0;}to{transform:none;opacity:1;}}
+.toast-steal{background:#ff6b5e;color:#2c0a06;}
+.toast-sabotage{background:var(--gold);color:#3a2a00;}
+.toast-shield{background:var(--cyan);color:#06222a;}
+
+/* ----- ปุ่มถูก/ผิด (จอนักเรียน) ----- */
+.tf-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.tf-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  border:none;border-radius:16px;padding:26px 14px;cursor:pointer;font-family:"Chakra Petch";
+  font-weight:700;font-size:1.2rem;color:#0e1420;transition:transform .05s ease,filter .15s ease;}
+.tf-btn:active{transform:translateY(1px);}
+.tf-btn:disabled{opacity:.6;cursor:not-allowed;}
+.tf-mark{font-size:2rem;}
+.tf-true{background:var(--lime);}
+.tf-false{background:var(--coral);color:#2c0a06;}
+
+/* ----- หน้า Admin: คลังข้อสอบ ----- */
+.set-tabs{display:flex;flex-wrap:wrap;gap:8px;}
+.set-tab{display:flex;align-items:center;gap:8px;background:var(--asphalt-2);
+  border:1px solid var(--line);border-radius:999px;padding:8px 8px 8px 16px;cursor:pointer;
+  font-weight:600;font-size:.92rem;}
+.set-tab.active{border-color:var(--cyan);background:rgba(34,211,238,.12);}
+.set-del{background:rgba(255,255,255,.06);border:none;color:var(--muted-2);cursor:pointer;
+  width:24px;height:24px;border-radius:50%;font-size:.8rem;line-height:1;}
+.set-del:hover{background:var(--coral);color:#fff;}
+
+.seg{display:flex;gap:8px;}
+.seg-btn{flex:1;background:var(--asphalt-2);border:1px solid var(--line);color:var(--muted-2);
+  border-radius:12px;padding:12px;cursor:pointer;font-family:"Chakra Petch";font-weight:600;font-size:.95rem;}
+.seg-btn.on{border-color:var(--cyan);background:rgba(34,211,238,.12);color:var(--paper);}
+
+.choice-edit{display:flex;flex-direction:column;gap:8px;}
+.choice-edit-row{display:flex;align-items:center;gap:10px;}
+.choice-edit-row input[type=radio]{width:20px;height:20px;flex:0 0 auto;accent-color:var(--lime);}
+
+.file-input{width:100%;color:var(--muted-2);font-size:.9rem;}
+.file-input::file-selector-button{background:var(--asphalt-2);border:1px solid var(--line-strong);
+  color:var(--paper);border-radius:10px;padding:8px 14px;margin-right:10px;cursor:pointer;font-family:inherit;}
+
+.q-list{display:flex;flex-direction:column;gap:8px;}
+.q-item{display:flex;align-items:flex-start;gap:10px;background:var(--asphalt-2);
+  border:1px solid var(--line);border-radius:12px;padding:12px 14px;}
+.q-item-main{flex:1;min-width:0;}
+.q-item-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.q-item-body{font-weight:600;}
+.q-tag{font-family:"Chakra Petch";font-size:.72rem;padding:3px 9px;border-radius:999px;flex:0 0 auto;}
+.tag-mc{background:rgba(34,211,238,.16);color:var(--cyan);}
+.tag-tf{background:rgba(167,139,250,.18);color:var(--violet);}
+.q-item-choices{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:6px;}
+.q-choice{font-size:.85rem;color:var(--muted-2);}
+.q-choice.correct{color:var(--lime);font-weight:700;}
+.csv-preview{margin-top:4px;}
+.q-item-actions{display:flex;gap:6px;flex:0 0 auto;}
+.q-item-editing{border-color:var(--cyan);background:rgba(34,211,238,.10);}
+.q-thumb{width:54px;height:54px;object-fit:cover;border-radius:8px;flex:0 0 auto;border:1px solid var(--line);}
+.q-image-preview{max-width:100%;max-height:160px;border-radius:10px;margin-top:10px;border:1px solid var(--line);display:block;}
+.editing-card{border-color:var(--cyan);box-shadow:0 0 0 1px var(--cyan),0 18px 44px rgba(0,0,0,.4);}
