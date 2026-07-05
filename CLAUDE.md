@@ -21,7 +21,8 @@
 
 ## ฐานข้อมูล (Supabase)
 ตาราง: games, questions, players, answers, powerups, player_powerups, **question_sets, bank_questions** (คลังข้อสอบกลาง)
-- รัน SQL ตามลำดับ: `01_schema_v0.sql` → `02_lobby_rpcs.sql` → `03_seed_questions.sql` → `04_question_bank.sql` → `05_end_game.sql` → `06_admin_extras.sql` → `07_penalty_reflect.sql`
+- รัน SQL ตามลำดับ: `01_schema_v0.sql` → `02_lobby_rpcs.sql` → `03_seed_questions.sql` → `04_question_bank.sql` → `05_end_game.sql` → `06_admin_extras.sql` → `07_penalty_reflect.sql` → `08_fix_create_game.sql`
+- `08` แก้อาการ `create_game` ซ้อนกันหลาย overload ("Could not choose the best candidate function") — ลบทุก overload แล้วสร้างตัวเดียว (2 พารามิเตอร์ `p_duration_min, p_track_max`)
 - **ตอบผิดหักคะแนน** `settings.wrong_penalty` (ดีฟอลต์ 50) ไม่ต่ำกว่า 0 — กันตอบมั่ว (แก้ใน `07`)
 - พลัง 7 อัน (เพิ่ม **โล่สะท้อน** `reflect`: เด้งขโมย/กับดักกลับใส่คนโจมตี 1 ครั้ง · คอลัมน์ `players.reflect`) · ตอนตอบถูกเลือกกด 1 ใน 3 กล่องเอง พลังสุ่มฝั่งเซิร์ฟเวอร์
 - RPC หลัก: create_game (รับ track_max), start_game, **end_game**, join_game, get_next_question, submit_answer, open_box, execute_targeted_power
@@ -55,10 +56,14 @@
   - **คลังกลางใช้ซ้ำได้**: จัดเป็น "ชุด" (question_sets) ตอนครูสร้างห้อง เลือกชุด → `copy_set_to_game` คัดลอกเข้าห้อง
   - เพิ่มข้อทีละข้อ (ปรนัย/ถูกผิด) + นำเข้า CSV (มี template ให้ดาวน์โหลด, parser ที่ `src/lib/csv.js`)
   - gate ด้วยรหัสใน `.env` `VITE_ADMIN_PASSWORD` (ดีฟอลต์ `admin`) — เป็น client-side gate กันคนทั่วไป ไม่ใช่ auth จริง (ระบบยังไม่มี user login)
+  - **ด่านรหัสผ่านแยกเป็น `src/components/AdminGate.jsx` ใช้ซ้ำ** — ครอบทั้ง `/admin` และ `/host` (ครูต้องกรอกรหัสเดียวกันก่อนสร้างห้อง) ปลดล็อกครั้งเดียวใช้ได้ทั้งคู่ (key `quizrush_admin_ok` ใน sessionStorage)
   - เวลาแข่ง = เวลารวมทั้งเกม ตั้งตอนสร้างห้องใน HostLobby (ไม่ได้ทำเวลาต่อข้อ)
   - **แก้ไขข้อสอบ/เปลี่ยนชื่อชุด/รูปภาพในโจทย์** (image_url) ทำได้ในหน้า admin · ครูปรับ `track_max_score` ตอนสร้างห้องได้
 - [x] จบเกม + ประกาศผล (โพเดียม) บนจอครู · leaderboard สด Top 10 ข้างขวา · แจ้งเตือนนักเรียนเมื่อโดนพลังโจมตี (toast) + เสียง/สั่น (`src/lib/sfx.js`)
+- [x] **เล่นจบแล้วเข้าเกมใหม่ง่ายขึ้น** — หน้าจบของนักเรียนมีปุ่ม "เข้าร่วมเกมใหม่" ไป `/join` ตรง ๆ (ไม่ต้องสแกน QR ใหม่) · `JoinPage` prefill ชื่อ/สีจากเกมก่อน
+- [x] **สนามแข่งธีมกลางวันคาร์นิวัล** — ท้องฟ้าไล่เฉด (SkyDome) + เมฆลอย + ธงราวหลากสี + ลูกโป่ง + คอนเฟตตี + แสงแดดอุ่น (แทนธีมกลางคืนเดิม)
 
 ## คำสั่งที่ใช้บ่อย
 - `npm run dev` — รันทดสอบ (localhost:5173)
 - `npm run build` — สร้าง dist/ สำหรับลากขึ้น Netlify
+- `.claude/launch.json` — คอนฟิก dev/preview server สำหรับพรีวิวใน Claude Code

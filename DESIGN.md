@@ -173,8 +173,10 @@ if sabotaged:
 ## 7. กฎสำคัญ (ห้ามพลาด)
 
 1. **เฉลยห้ามหลุดไป client** — `correct_index` เข้าถึงผ่าน RPC เท่านั้น ตรวจคำตอบฝั่งเซิร์ฟเวอร์เสมอ
-2. **พลังโจมตีสุ่มเป้าหมาย เลือกคนเองไม่ได้** — ใช้ `pending_power` / `pending_target` ล็อกเป้า
-3. ห้าม commit `.env`
+2. **พลังโจมตีสุ่มเป้าหมาย เลือกคนเองไม่ได้** — ใช้ `pending_power` / `pending_target` ล็อกเป้า · สุ่มได้ทุกคนเท่ากัน (ไม่กรองคะแนน/สถานะเชื่อมต่อ)
+3. **ตอบผิดหักคะแนน** `settings.wrong_penalty` (ดีฟอลต์ 50) แต่คะแนนรวมไม่ต่ำกว่า 0 — กันตอบมั่ว
+4. **`create_game` ต้องมี overload เดียว** — ถ้ามีหลายเวอร์ชันใน DB จะเจอ "Could not choose the best candidate function" (แก้ด้วย `db/08`)
+5. ห้าม commit `.env`
 
 ---
 
@@ -205,7 +207,10 @@ if sabotaged:
   - คลังกลางใช้ซ้ำได้ จัดเป็น "ชุด" (question_sets) → ตอนสร้างห้องเลือกชุด → `copy_set_to_game` คัดลอกเข้าห้อง
   - เพิ่มข้อทีละข้อ (ปรนัย/ถูกผิด) + นำเข้า CSV (มี template + parser ที่ `src/lib/csv.js`)
   - แก้ไขข้อสอบ/เปลี่ยนชื่อชุด/รูปภาพในโจทย์ (image_url) · gate ด้วย `VITE_ADMIN_PASSWORD` (client-side gate)
+  - **ด่านรหัสผ่านแยกเป็น `src/components/AdminGate.jsx` ใช้ซ้ำ** — ครอบทั้ง `/admin` และ `/host` (ครูต้องกรอกรหัสก่อนสร้างห้อง) ปลดล็อกครั้งเดียวใช้ได้ทั้งคู่
 - [x] **จบเกม + ประกาศผล** — end_game + โพเดียมบนจอครู · leaderboard สด Top 10 · toast + เสียง/สั่น (`src/lib/sfx.js`) แจ้งเตือนเมื่อโดนพลังโจมตี
+- [x] **ปรับสนามเป็นธีมกลางวันคาร์นิวัล** — ท้องฟ้าไล่เฉด + เมฆลอย + ธงราวหลากสี + ลูกโป่ง + คอนเฟตตี + แสงแดดอุ่น
+- [x] **เล่นจบเข้าเกมใหม่ง่ายขึ้น** — หน้าจบนักเรียนมีปุ่ม "เข้าร่วมเกมใหม่" ไป `/join` (ไม่ต้องสแกน QR ใหม่) · prefill ชื่อ/สีจากเกมก่อน
 
 ---
 
@@ -215,6 +220,7 @@ if sabotaged:
 quiz-rush/
 ├─ CLAUDE.md              บริบทย่อ (Claude Code อ่านอัตโนมัติ)
 ├─ DESIGN.md              ไฟล์นี้
+├─ .claude/launch.json    คอนฟิก dev/preview server (พรีวิวใน Claude Code)
 ├─ db/                    รันตามลำดับเลขใน Supabase SQL Editor
 │  ├─ 01_schema_v0.sql    ตาราง + RLS + seed พลัง + RPC หลัก
 │  ├─ 02_lobby_rpcs.sql   create_game + start_game
@@ -222,12 +228,13 @@ quiz-rush/
 │  ├─ 04_question_bank.sql    question_sets + bank_questions + RPC คลังข้อสอบ
 │  ├─ 05_end_game.sql     end_game RPC
 │  ├─ 06_admin_extras.sql แก้ไขข้อสอบ/ชุด + image_url
-│  └─ 07_penalty_reflect.sql   หักคะแนนตอบผิด + พลังโล่สะท้อน
+│  ├─ 07_penalty_reflect.sql   หักคะแนนตอบผิด + พลังโล่สะท้อน
+│  └─ 08_fix_create_game.sql   ลบ create_game ที่ซ้อนกัน เหลือตัวเดียว
 ├─ public/
 │  ├─ _redirects          SPA fallback (Netlify)
 │  └─ fonts/Sarabun-Bold.ttf   ฟอนต์ไทยสำหรับป้ายชื่อในสนาม 3D
 └─ src/
    ├─ lib/                supabase.js, api.js, constants.js, csv.js, sfx.js
-   ├─ components/         Pieces.jsx (PlayerChip, ColorPicker), RaceField.jsx (สนาม 3D)
+   ├─ components/         Pieces.jsx, RaceField.jsx (สนาม 3D), AdminGate.jsx (ด่านรหัสผ่าน)
    └─ pages/              Home, HostLobby, JoinPage, PlayerLobby, Playing, Admin
 ```
