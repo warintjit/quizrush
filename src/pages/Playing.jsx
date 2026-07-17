@@ -25,10 +25,11 @@ export default function Playing() {
   const { gameId } = useParams()
   const [params] = useSearchParams()
   const role = params.get('role') || 'player'
+  const practiceMode = params.get('mode') === 'practice'
   const nav = useNavigate()
 
   if (role === 'host') return <HostField gameId={gameId} />
-  return <PlayerEngine gameId={gameId} />
+  return <PlayerEngine gameId={gameId} practiceMode={practiceMode} />
 }
 
 // ---------- สนามแข่ง 3D บนจอครู (ค) ----------
@@ -257,12 +258,15 @@ function HostResults({ players, onHome }) {
 }
 
 // ---------- เครื่องยนต์ควิซบนมือถือ (ข) ----------
-function PlayerEngine({ gameId }) {
+function PlayerEngine({ gameId, practiceMode }) {
   const nav = useNavigate()
   const session = loadSession()
+  const isPractice = practiceMode || session?.mode === 'practice'
 
   const [game, setGame] = useState(null)
   const [score, setScore] = useState(0)
+  const [correctCount, setCorrectCount] = useState(0)
+  const [answeredCount, setAnsweredCount] = useState(0)
   const [remainingSec, setRemainingSec] = useState(null)
   const [finished, setFinished] = useState(false)
   const [notices, setNotices] = useState([]) // toast แจ้งเตือนโดนพลังโจมตี
@@ -272,6 +276,7 @@ function PlayerEngine({ gameId }) {
   const prevSabotagedRef = useRef(false)
   const prevShieldRef = useRef(false)
   const prevReflectRef = useRef(false)
+  const practiceEndedRef = useRef(false)
 
   function pushNotice(text, kind) {
     const id = Math.random().toString(36).slice(2)
@@ -320,7 +325,13 @@ function PlayerEngine({ gameId }) {
     const tick = () => {
       const left = Math.max(0, Math.floor((new Date(game.ends_at).getTime() - Date.now()) / 1000))
       setRemainingSec(left)
-      if (left <= 0) setFinished(true)
+      if (left <= 0) {
+        setFinished(true)
+        if (isPractice && !practiceEndedRef.current) {
+          practiceEndedRef.current = true
+          endGame(gameId).catch(() => {})
+        }
+      }
     }
     tick()
     const id = setInterval(tick, 1000)
@@ -334,6 +345,8 @@ function PlayerEngine({ gameId }) {
     fetchPlayer(session.playerId).then((p) => {
       if (!alive) return
       setScore(p.score)
+      setCorrectCount(p.correct_count)
+      setAnsweredCount(p.answered_count)
       prevScoreRef.current = p.score
       prevSabotagedRef.current = p.sabotaged
       prevShieldRef.current = p.shield
@@ -366,6 +379,8 @@ function PlayerEngine({ gameId }) {
       prevShieldRef.current = np.shield
       prevReflectRef.current = np.reflect
       setScore(np.score)
+      setCorrectCount(np.correct_count)
+      setAnsweredCount(np.answered_count)
     })
     return () => {
       alive = false
@@ -465,14 +480,30 @@ function PlayerEngine({ gameId }) {
     return (
       <div className="app">
         <div className="wrap center">
-          <div className="brand">🏁 หมดเวลา!</div>
+          <div className="brand">{isPractice ? '🧠 ฝึกเสร็จแล้ว!' : '🏁 หมดเวลา!'}</div>
           <div className="spacer" />
           <div className="card" style={{ maxWidth: 420 }}>
             <p className="muted" style={{ marginTop: 0 }}>คะแนนสุดท้ายของคุณ</p>
             <div className="final-score">{score}</div>
+            {isPractice && (
+              <div className="practice-summary">
+                <div>
+                  <b>{correctCount}</b>
+                  <span>ตอบถูก</span>
+                </div>
+                <div>
+                  <b>{answeredCount}</b>
+                  <span>ตอบทั้งหมด</span>
+                </div>
+                <div>
+                  <b>{answeredCount ? Math.round((correctCount / answeredCount) * 100) : 0}%</b>
+                  <span>ความแม่นยำ</span>
+                </div>
+              </div>
+            )}
             <div className="spacer" />
-            <button className="btn btn-primary" onClick={() => nav('/join')}>
-              🎮 เข้าร่วมเกมใหม่
+            <button className="btn btn-primary" onClick={() => nav(isPractice ? '/practice' : '/join')}>
+              {isPractice ? '🧠 ฝึกอีกครั้ง' : '🎮 เข้าร่วมเกมใหม่'}
             </button>
             <div className="spacer" />
             <button className="btn btn-ghost" onClick={() => nav('/')}>
@@ -504,6 +535,7 @@ function PlayerEngine({ gameId }) {
           <span className="score-pill">
             🏆 <b>{score}</b> แต้ม
           </span>
+          {isPractice && <span className="practice-pill">🧠 โหมดฝึก</span>}
           {remainingSec !== null && (
             <span className="time-pill">⏱ {fmtTime(remainingSec)}</span>
           )}

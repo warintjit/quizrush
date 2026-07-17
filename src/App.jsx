@@ -5,6 +5,7 @@ import JoinPage from './pages/JoinPage'
 import PlayerLobby from './pages/PlayerLobby'
 import Playing from './pages/Playing'
 import Admin from './pages/Admin'
+import Practice from './pages/Practice'
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/host" element={<HostLobby />} />
         <Route path="/join" element={<JoinPage />} />
+        <Route path="/practice" element={<Practice />} />
         <Route path="/lobby/:gameId" element={<PlayerLobby />} />
         <Route path="/play/:gameId" element={<Playing />} />
         <Route path="/admin" element={<Admin />} />

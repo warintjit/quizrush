@@ -17,6 +17,10 @@ export default function Home() {
           <button className="btn btn-primary" onClick={() => nav('/join')}>
             🎮 เข้าร่วม (นักเรียน)
           </button>
+          <div className="spacer" />
+          <button className="btn btn-violet" onClick={() => nav('/practice')}>
+            🧠 ฝึกทำข้อสอบคนเดียว
+          </button>
         </div>
         <div className="spacer" />
         <button className="link" onClick={() => nav('/admin')}>⚙ คลังข้อสอบ (ผู้ดูแล)</button>

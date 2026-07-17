@@ -54,6 +54,7 @@ label,.label{display:block;font-family:"Chakra Petch";font-size:.78rem;
 .btn-primary{background:var(--cyan);color:#06222a;}
 .btn-gold{background:var(--gold);color:#3a2a00;}
 .btn-lime{background:var(--lime);color:#143000;}
+.btn-violet{background:var(--violet);color:#1a0a2e;}
 .btn-ghost{background:transparent;border:1px solid var(--line-strong);color:var(--paper);}
 .btn-row{display:flex;gap:12px;margin-top:8px;}
 
@@ -241,6 +242,20 @@ input[type=range]{flex:1;accent-color:var(--cyan);}
 .tf-mark{font-size:2rem;}
 .tf-true{background:var(--lime);}
 .tf-false{background:var(--coral);color:#2c0a06;}
+
+/* ----- โหมดฝึกคนเดียว ----- */
+.practice-heading{font-family:"Chakra Petch";font-size:1.35rem;font-weight:700;color:var(--violet);
+  margin-top:8px;text-shadow:0 0 20px rgba(167,139,250,.3);}
+.practice-card{border-color:rgba(167,139,250,.42);
+  box-shadow:0 18px 44px rgba(0,0,0,.4),0 0 28px rgba(167,139,250,.08);}
+.practice-note{font-size:.82rem;color:var(--muted-2);margin-top:8px;line-height:1.55;}
+.practice-pill{font-family:"Chakra Petch";font-weight:700;background:rgba(167,139,250,.18);
+  color:#c9b8ff;border:1px solid rgba(167,139,250,.45);border-radius:999px;padding:8px 12px;}
+.practice-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px;width:100%;}
+.practice-summary>div{display:flex;flex-direction:column;gap:3px;background:var(--asphalt-2);
+  border:1px solid var(--line);border-radius:12px;padding:12px 6px;}
+.practice-summary b{font-family:"Chakra Petch";font-size:1.2rem;color:var(--violet);}
+.practice-summary span{font-size:.75rem;color:var(--muted-2);}
 
 /* ----- หน้า Admin: คลังข้อสอบ ----- */
 .set-tabs{display:flex;flex-wrap:wrap;gap:8px;}
